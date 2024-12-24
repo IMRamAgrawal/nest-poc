@@ -1,14 +1,17 @@
-import { Controller, Get, Param, Patch, Body, Delete } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, Patch, Body, Delete , UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AdminGuard } from '../guards/admin.guard';
 
 @ApiTags('Users') // Tag for grouping endpoints in Swagger UI
+@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @UseGuards(AdminGuard) // Apply AdminGuard to this endpoint
   @ApiOperation({ summary: 'Retrieve all users' })
   @ApiResponse({ status: 200, description: 'List of users retrieved successfully.' })
   findAll() {

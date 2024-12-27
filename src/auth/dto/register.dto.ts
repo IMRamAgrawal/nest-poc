@@ -4,11 +4,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
 export class RegisterDto {
-  @ApiProperty({ example: 'user@example.com', description: 'User email address' })
+  @ApiProperty({ example: 'admin@example.com', description: 'User email address' })
   @IsEmail()
   email: string;
 
-  @ApiProperty({ example: 'password123', description: 'User password' })
+  @ApiProperty({ example: 'admin@1234', description: 'User password' })
   @IsString()
   @IsNotEmpty()
   password: string;

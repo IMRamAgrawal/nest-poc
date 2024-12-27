@@ -20,4 +20,9 @@ export class UserService {
   async delete(id: string) {
     return this.prisma.user.delete({ where: { id } });
   }
+
+  async getProfile(userId: string) {
+    
+    return this.prisma.user.findUnique({ where: { id: userId } });
+  }
 }

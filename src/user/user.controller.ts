@@ -1,12 +1,14 @@
-import { Controller, Get, Param, Patch, Body, Delete , UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Body, Delete , UseGuards , Req} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminGuard } from '../guards/admin.guard';
+import { AuthGuard } from '../guards/auth.guard';
 
 @ApiTags('Users') // Tag for grouping endpoints in Swagger UI
 @ApiBearerAuth()
 @Controller('users')
+
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -18,30 +20,35 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Retrieve a single user by ID' })
-  @ApiParam({ name: 'id', description: 'The ID of the user', example: '12345' })
-  @ApiResponse({ status: 200, description: 'User retrieved successfully.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+  @Get('profile')
+  @UseGuards(AuthGuard) 
+  @ApiOperation({ summary: 'Retrieve the authenticated user\'s profile' })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access.' })
+  getProfile(@Req() req) {
+    console.log(req.user)
+    return this.userService.getProfile(req.user.sub);
   }
-
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update a user by ID' })
-  @ApiParam({ name: 'id', description: 'The ID of the user', example: '12345' })
+  
+  @Patch()
+  @UseGuards(AuthGuard) 
+  @ApiOperation({ summary: 'Update a user' })
+  // @ApiParam({ name: 'id', description: 'The ID of the user', example: '12345' })
   @ApiResponse({ status: 200, description: 'User updated successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(req.user.sub, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete()
+  @UseGuards(AuthGuard) 
   @ApiOperation({ summary: 'Delete a user by ID' })
-  @ApiParam({ name: 'id', description: 'The ID of the user', example: '12345' })
+  // @ApiParam({ name: 'id', description: 'The ID of the user', example: '12345' })
   @ApiResponse({ status: 200, description: 'User deleted successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  delete(@Param('id') id: string) {
-    return this.userService.delete(id);
+  delete(@Req() req) {
+    return this.userService.delete(req.user.sub);
   }
 }
+
+

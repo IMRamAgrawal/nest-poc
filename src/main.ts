@@ -8,7 +8,9 @@ async function bootstrap() {
   // Configure Swagger
   const config = new DocumentBuilder()
     .setTitle('NestJS Auth API')
-    .setDescription('API documentation for role-based authentication, user CRUD, and more')
+    .setDescription(
+      'API documentation for role-based authentication, user CRUD, and more',
+    )
     .setVersion('1.0')
     .addBearerAuth() // Add support for Bearer Token
     .build();
@@ -18,4 +20,3 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
-

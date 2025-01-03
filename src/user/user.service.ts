@@ -6,7 +6,11 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      where: {
+        role: 'USER', // Filter users to only include those with the role USER
+      },
+    });
   }
 
   async findOne(id: string) {
@@ -22,7 +26,6 @@ export class UserService {
   }
 
   async getProfile(userId: string) {
-    
     return this.prisma.user.findUnique({ where: { id: userId } });
   }
 }

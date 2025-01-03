@@ -1,4 +1,3 @@
-
 // src/user/user.module.ts
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -6,7 +5,6 @@ import { UserController } from './user.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AdminGuard } from '../guards/admin.guard';
-
 
 @Module({
   imports: [
@@ -18,7 +16,6 @@ import { AdminGuard } from '../guards/admin.guard';
   ],
   controllers: [UserController],
   providers: [UserService, AdminGuard],
-  exports: [UserService], 
+  exports: [UserService],
 })
-
 export class UserModule {}

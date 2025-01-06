@@ -10,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '@prisma/client';
 import { MailService } from '../mail/mail.service';
 import { randomBytes } from 'crypto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -62,7 +64,13 @@ export class AuthService {
     };
   }
 
-  async register(email: string, password: string, role: Role, name: string) {
+  async register(
+    email: string,
+    password: string,
+    role: Role,
+    name: string,
+    profileImage?: string,
+  ) {
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -78,6 +86,7 @@ export class AuthService {
           password: hashedPassword,
           role,
           name,
+          profileImage,
         },
         select: {
           id: true,

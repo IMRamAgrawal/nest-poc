@@ -3,37 +3,65 @@ import {
   Controller,
   Post,
   UnauthorizedException,
+  UseInterceptors,
+  UploadedFile,
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
+import { RegisterWithFileDto } from './dto/register-file.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { Express } from 'express';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User successfully registered.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
-  async register(@Body() registerDto: RegisterDto) {
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('profileImage'))
+  async register(
+    @Body() registerDto: RegisterWithFileDto,
+
+    @UploadedFile() profileImage: Express.Multer.File,
+  ) {
+    let profileImageUrl = null;
+
+    if (profileImage) {
+      profileImageUrl = await this.cloudinaryService.uploadImage(profileImage);
+    }
+
+    // Construct the registration data object with the profile image URL
+    const registrationData = {
+      ...registerDto,
+      profileImage: profileImageUrl,
+    };
+
     return this.authService.register(
-      registerDto.email,
-      registerDto.password,
-      registerDto.role,
-      registerDto.name,
+      registrationData.email,
+      registrationData.password,
+      registrationData.role,
+      registrationData.name,
+      registrationData.profileImage,
     );
   }
 

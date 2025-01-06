@@ -5,13 +5,20 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UserModule } from '../user/user.module';
-
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from '../mail/mail.module';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
     PrismaModule,
+    CloudinaryModule,
+    MulterModule.register({
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB limit
+      },
+    }),
     PassportModule,
     UserModule,
     ConfigModule,
